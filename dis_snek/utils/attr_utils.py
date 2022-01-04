@@ -20,7 +20,21 @@ field_defaults = dict(repr=False)
 
 
 define = partial(attr.define, **class_defaults)  # type: ignore
-field = partial(attr.field, **field_defaults)  # type: ignore
+
+
+def field(*, docs=None, no_export=False, **kwargs):  # type: ignore
+    metadata = kwargs.get("metadata", dict())
+    if docs is not None:
+        metadata["docs"] = docs
+    if no_export:
+        metadata["no_export"] = True
+
+    if metadata:
+        kwargs["metadata"] = metadata
+
+    final_kwargs = field_defaults | kwargs
+
+    return attr.field(**final_kwargs)
 
 
 def copy_converter(value):
