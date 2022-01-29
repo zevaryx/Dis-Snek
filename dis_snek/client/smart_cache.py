@@ -1,5 +1,6 @@
 import logging
-from typing import TYPE_CHECKING, List, Dict, Any, Optional, Union
+from typing import TYPE_CHECKING, List, Dict, Any, Optional, Set, Union
+import asyncio
 
 import attr
 
@@ -181,6 +182,25 @@ class GlobalCache:
             guild._member_ids.add(user_id)  # noqa
         return member
 
+    def place_bulk_member_data(self, guild_id: int, members: List[dict]) -> Set[int]:
+        """
+        Take json data representing multiple members, processes them, and caches them.
+
+        Args:
+            data: array of json representation of the members
+
+        Returns:
+            The ids of the members to be processed
+        """
+
+        async def place() -> None:
+            for data in members:
+                self.place_member_data(guild_id, data)
+                await asyncio.sleep(0)
+
+        asyncio.create_task(place())
+        return {to_snowflake(data["id"] if "member" in data else data["user"]["id"]) for data in members}
+
     def place_user_guild(self, user_id: "Snowflake_Type", guild_id: "Snowflake_Type") -> None:
         """
         Add a guild to the list of guilds a user has joined.
@@ -354,6 +374,25 @@ class GlobalCache:
             channel.update_from_dict(data)
 
         return channel
+
+    def place_bulk_channel_data(self, channels: List[dict]) -> Set[int]:
+        """
+        Take json data representing multiple channels, processes them, and caches them.
+
+        Args:
+            data: array of json representation of the channels
+
+        Returns:
+            The ids of the channels to be processed
+        """
+
+        async def place() -> None:
+            for data in channels:
+                self.place_channel_data(data)
+                await asyncio.sleep(0)
+
+        asyncio.create_task(place())
+        return {to_snowflake(channel_data["id"]) for channel_data in channels}
 
     def place_dm_channel_id(self, user_id, channel_id) -> None:
         """

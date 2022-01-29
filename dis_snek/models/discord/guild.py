@@ -3,7 +3,7 @@ import logging
 import time
 from io import IOBase
 from pathlib import Path
-from typing import List, Optional, Union, Set
+from typing import TYPE_CHECKING, List, Optional, Union, Set
 
 import attr
 from aiohttp import FormData
@@ -43,6 +43,8 @@ __all__ = [
 ]
 
 log = logging.getLogger(logger_name)
+if TYPE_CHECKING:
+    from dis_snek.client import Snake
 
 
 @define()
@@ -180,7 +182,7 @@ class Guild(BaseGuild):
     _chunk_cache: list = attr.ib(factory=list)
 
     @classmethod
-    def _process_dict(cls, data, client):
+    def _process_dict(cls, data, client: "Snake") -> dict:
         # todo: find a away to prevent this loop from blocking the event loop
         data = super()._process_dict(data, client)
         guild_id = data["id"]
@@ -188,13 +190,13 @@ class Guild(BaseGuild):
         channels_data = data.pop("channels", [])
         for c in channels_data:
             c["guild_id"] = guild_id
-        data["channel_ids"] = {client.cache.place_channel_data(channel_data).id for channel_data in channels_data}
+        data["channel_ids"] = client.cache.place_bulk_channel_data(channels_data)
 
         threads_data = data.pop("threads", [])
-        data["thread_ids"] = {client.cache.place_channel_data(thread_data).id for thread_data in threads_data}
+        data["thread_ids"] = client.cache.place_bulk_channel_data(threads_data)
 
         members_data = data.pop("members", [])
-        data["member_ids"] = {client.cache.place_member_data(guild_id, member_data).id for member_data in members_data}
+        data["member_ids"] = client.cache.place_bulk_member_data(guild_id, members_data)
 
         roles_data = data.pop("roles", [])
         data["role_ids"] = set(client.cache.place_role_data(guild_id, roles_data).keys())
