@@ -73,6 +73,7 @@ from dis_snek.models.discord.enums import ComponentTypes, Intents, InteractionTy
 from dis_snek.models.discord.modal import Modal
 from dis_snek.models.snek.auto_defer import AutoDefer
 from .smart_cache import GlobalCache
+from ..models.snek.VoiceState import ActiveVoiceState
 
 if TYPE_CHECKING:
     from io import IOBase
@@ -1738,11 +1739,11 @@ class Snake(
         regions = VoiceRegion.from_list(regions_data)
         return regions
 
-    async def connect_to_vc(self, guild_id: "Snowflake_Type", channel_id: "Snowflake_Type"):
+    async def connect_to_vc(self, guild_id: "Snowflake_Type", channel_id: "Snowflake_Type") -> ActiveVoiceState:
         return await self._connection_state.voice_connect(guild_id, channel_id)
 
-    def get_bot_voice_state(self, guild_id: "Snowflake_Type"):
-        return self._connection_state.get_voice_state(guild_id)
+    def get_bot_voice_state(self, guild_id: "Snowflake_Type") -> ActiveVoiceState:
+        return self._connection_state.get_bot_voice_state(guild_id)
 
     async def change_presence(
         self, status: Optional[Union[str, Status]] = Status.ONLINE, activity: Optional[Union[Activity, str]] = None
