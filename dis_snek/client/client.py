@@ -73,7 +73,7 @@ from dis_snek.models.discord.enums import ComponentTypes, Intents, InteractionTy
 from dis_snek.models.discord.modal import Modal
 from dis_snek.models.snek.auto_defer import AutoDefer
 from .smart_cache import GlobalCache
-from ..models.snek.VoiceState import ActiveVoiceState
+from ..models.snek.active_voice_state import ActiveVoiceState
 
 if TYPE_CHECKING:
     from io import IOBase

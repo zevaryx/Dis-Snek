@@ -15,7 +15,7 @@ from dis_snek.models.discord.emoji import CustomEmoji
 from dis_snek.models.discord.snowflake import to_snowflake, to_optional_snowflake
 from dis_snek.client.utils.attr_utils import define, field
 from dis_snek.client.utils.cache import TTLCache
-from dis_snek.models.snek.VoiceState import ActiveVoiceState
+from dis_snek.models.snek.active_voice_state import ActiveVoiceState
 
 if TYPE_CHECKING:
     from dis_snek.client import Snake
